@@ -1,4 +1,41 @@
-// Async event callbacks
+// Nested Calbacks
+// referred as Callback Hell
+
+// async functions we don't we it will complete
+
+getUser("facebook/Tamil", (user, error) => {
+  if (error) {
+    throw error;
+  }
+
+  const userId = user.id;
+
+  getFriends(userId, (friends, error) => {
+    if (error) {
+      throw error;
+    }
+
+    const tamil = friends.find();
+
+    getPosts(tamil, (posts, error) => {
+      if (error) {
+        throw error;
+      }
+
+      const recentPost = posts[0];
+
+      getCommentsForPost(recentPost, (comments, error) => {
+        if (error) {
+          throw error;
+        }
+
+        displayComments(comments);
+      });
+    });
+  });
+});
+
+// Promises
 
 const myPromise1 = new Promise((resolve, reject) => {
   setTimeout(() => {
@@ -54,39 +91,42 @@ myPromise3
   .then((newValue) => console.log(newValue))
   .catch((rejectValue) => console.log(rejectValue));
 
-// Nested Calbacks
-// referred as Callback Hell
+// Handling Async event callbacks
 
-// async functions we don't we it will complete
+fetch("https://jsonplaceholder.typicode.com/users")
+  .then((response) => response.json())
+  .then((users) => {
+    const firstUser = users[0];
+    console.log(firstUser);
+    return fetch(
+      "https://jsonplaceholder.typicode.com/posts?userId=" + firstUser.id
+    );
+  })
+  .then((response) => response.json())
+  .then((posts) => console.log(posts));
 
-getUser("facebook/Tamil", (user, error) => {
-  if (error) {
-    throw error;
+// Handling Async event callbacks
+
+const myAsyncFunction = async () => {
+  try {
+    const usersResponse = await fetch(
+      "https://jsonplaceholder.typicode.com/users"
+    );
+
+    const users = await usersResponse.json();
+
+    const firstUser = users[0];
+
+    console.log(firstUser);
+
+    const postsResponse = await fetch(
+      "https://jsonplaceholder.typicode.com/posts?userId=" + firstUser.id
+    );
+
+    const posts = await postsResponse.json();
+
+    console.log(posts);
+  } catch (error) {
+    console.log("There was an error!!!");
   }
-
-  const userId = user.id;
-
-  getFriends(userId, (friends, error) => {
-    if (error) {
-      throw error;
-    }
-
-    const tamil = friends.find();
-
-    getPosts(tamil, (posts, error) => {
-      if (error) {
-        throw error;
-      }
-
-      const recentPost = posts[0];
-
-      getCommentsForPost(recentPost, (comments, error) => {
-        if (error) {
-          throw error;
-        }
-
-        displayComments(comments);
-      });
-    });
-  });
-});
+};
